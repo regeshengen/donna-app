@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, ImageBackground, Image, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 import moment from 'moment'
 import 'moment/locale/pt-br'
@@ -8,6 +10,7 @@ import Task from '../components/Task'
 
 export default class TaskList extends Component {
     state = {
+        showDoneTasks: true,
         tasks: [{
             id: Math.random(),
             desc: 'Curso de React Native',
@@ -62,6 +65,10 @@ export default class TaskList extends Component {
         }]
     }
 
+    toggleFilter = () => {
+        this.setState({ showDoneTasks: !this.state.showDoneTasks })
+    }
+
     toggleTask = taskId => {
         const tasks = [...this.state.tasks]
         tasks.forEach(task => {
@@ -79,7 +86,16 @@ export default class TaskList extends Component {
                     <Image source={require('../../assets/img/logo-nav.png')}></Image>
                 </View>
                 <View style={styles.containerList}>
-                    <Text style={styles.contrastDateYellow}>{today}</Text>
+                    <View style={[globalStyle.rowDirection, globalStyle.spaceBetween]}>
+                        <Text style={styles.contrastDateYellow}>{today}</Text>
+                        <View>
+                            <TouchableOpacity onPress={this.toggleFilter}>
+                                <FontAwesomeIcon style={globalStyle.blue} icon={ this.state.showDoneTasks ? faEye : faEyeSlash } size={25} />
+                            </TouchableOpacity>
+                        </View>
+    
+                    </View>
+
                     <FlatList data={this.state.tasks} keyExtractor={item => `${item.id}`}
                     renderItem={({item}) => <Task { ...item } toggleTask={this.toggleTask} />} />
                         
