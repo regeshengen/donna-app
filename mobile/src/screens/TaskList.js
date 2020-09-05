@@ -10,6 +10,7 @@ import Task from '../components/Task'
 
 export default class TaskList extends Component {
     state = {
+        visibleTasks: [],
         showDoneTasks: true,
         tasks: [{
             id: Math.random(),
@@ -20,7 +21,7 @@ export default class TaskList extends Component {
             id: Math.random(),
             desc: 'Curso de Java',
             estimate_at: new Date(),
-            done_at: new Date(),
+            done_at: null,
         },
         {
             id: Math.random(),
@@ -31,7 +32,7 @@ export default class TaskList extends Component {
             id: Math.random(),
             desc: 'Curso de Java',
             estimate_at: new Date(),
-            done_at: new Date(),
+            done_at: null,
         }, {
             id: Math.random(),
             desc: 'Curso de Java',
@@ -65,8 +66,24 @@ export default class TaskList extends Component {
         }]
     }
 
+    componentDidMount = () => {
+        this.filterTasks()
+    }
+
     toggleFilter = () => {
-        this.setState({ showDoneTasks: !this.state.showDoneTasks })
+        this.setState({ showDoneTasks: !this.state.showDoneTasks }, this.filterTasks)
+    }
+
+    filterTasks = () => {
+        let visibleTasks = null
+        if (this.state.showDoneTasks) {
+            visibleTasks = [...this.state.tasks]
+        } else {
+            const pending = task => task.done_at === null
+            visibleTasks = this.state.tasks.filter(pending)
+        }
+
+        this.setState({ visibleTasks })
     }
 
     toggleTask = taskId => {
@@ -76,7 +93,7 @@ export default class TaskList extends Component {
                 task.done_at = task.done_at ? null : new Date()
             }
         })
-        this.setState({tasks})
+        this.setState({tasks}, this.filterTasks)
     }
     render() {
         const today = moment().locale('pt-br').format('D[/]MM[/]YY ')
@@ -96,7 +113,7 @@ export default class TaskList extends Component {
     
                     </View>
 
-                    <FlatList data={this.state.tasks} keyExtractor={item => `${item.id}`}
+                    <FlatList data={this.state.visibleTasks} keyExtractor={item => `${item.id}`}
                     renderItem={({item}) => <Task { ...item } toggleTask={this.toggleTask} />} />
                         
                    
